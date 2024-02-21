@@ -1,0 +1,106 @@
+ private void gotoHillClimbingBTNActionPerformed(java.awt.event.ActionEvent evt) {                                                    
+          // TODO add your handling code here:
+        List<boolean[][]> successors = new ArrayList<>(); // Your list of all successors
+        boolean [][]queenMatrix=new boolean[n][n];
+        boolean [][]tempQueenMatrix=new boolean[n][n];
+        int []pos=new int[n];
+        for(int i=0;i<n;i++)
+        {
+            for(int j=0;j<n;j++)
+            {
+                queenMatrix[i][j]= matrixLabels[i][j].getName().equals("1") ? true : false;
+                if(queenMatrix[i][j])
+                    pos[j]=i;
+            }
+        }
+        int counter=0;
+//        for(int i=0;i<1;i++)
+//        {
+            for(int k=0;k<n;k++)
+            {
+                for (int v = 0; v < n; v++) 
+                    System.arraycopy(queenMatrix[v], 0, tempQueenMatrix[v], 0, n);
+                
+                     tempQueenMatrix[pos[k]][k]=false;
+                for(int otherPos=0;otherPos<n;otherPos++)
+                {
+                    if(otherPos!=pos[k])
+                    {
+                        tempQueenMatrix[otherPos][k]=true;
+                        System.out.println("Successor "+(counter++));
+                        printMatrix(tempQueenMatrix);
+                    
+                          boolean[][] newSuccessor = new boolean[n][n];      
+                          for (int v = 0; v < n; v++) 
+                                System.arraycopy(tempQueenMatrix[v], 0, newSuccessor[v], 0, n);
+                               ///////////add successors to the list
+                            successors.add(newSuccessor);
+                            tempQueenMatrix[otherPos][k] = false;
+                    }
+                }
+                
+            }
+                            ///////////calculate heuristic and find the best successor 
+                            boolean[][] bestSuccessor = null;
+                            int bestHeuristic = Integer.MAX_VALUE;
+
+                            for (boolean[][] successor : successors) 
+                            {
+                                int heuristic = calculateHeuristic(successor);
+                                 System.out.println(heuristic);
+                                if (heuristic < bestHeuristic) 
+                                {
+                                    bestHeuristic = heuristic;
+                                    bestSuccessor = successor;
+                                }
+                            }
+                            System.out.println("Best Successor:");
+                            printMatrix(bestSuccessor);
+    }                                                   
+    
+    
+    private void printMatrix(boolean[][] matrix) {
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                System.out.print(matrix[i][j] ? "1 " : "0 ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+    
+    private int calculateHeuristic(boolean[][] queenMatrix) {
+    
+        int n = queenMatrix.length;
+        int attacking = 0;
+  
+            for (int row = 0; row < n; row++) {
+                for (int col = 0; col < n; col++) {
+                    if (queenMatrix[row][col]) {
+                        // Check for conflicts in the same row
+                        for (int c = col + 1; c < n; c++) {
+                            if (queenMatrix[row][c]) {
+                                attacking++;
+                            }
+                        }
+
+                        // Check for conflicts in the diagonal (right-up)
+                        for (int r = row - 1, c = col + 1; r >= 0 && c < n; r--, c++) {
+                            if (queenMatrix[r][c]) {
+                                attacking++;
+                            }
+                        }
+
+                        // Check for conflicts in the diagonal (right-down)
+                        for (int r = row + 1, c = col + 1; r < n && c < n; r++, c++) {
+                            if (queenMatrix[r][c]) {
+                                attacking++;
+                            }
+                        }
+                    }
+                }
+            }
+
+    // Since we have counted each pair twice, divide by 2 to get the total attacking pairs.
+    return attacking ;
+}
